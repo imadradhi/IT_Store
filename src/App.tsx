@@ -7,19 +7,18 @@ import {
   deleteDevice,
   calculateStats,
 } from './services/deviceService';
-import { subscribeToAuthChanges, logout } from './services/authService';
+import { subscribeToAuthChanges, logout, type AppUser } from './services/authService';
 import { InventoryStats } from './components/InventoryStats';
 import { DeviceList } from './components/DeviceList';
 import { DeviceForm } from './components/DeviceForm';
 import { DeviceDetails } from './components/DeviceDetails';
 import { DetailedStats } from './components/DetailedStats';
 import { Login } from './components/Login';
-import type { User } from 'firebase/auth';
 import * as XLSX from 'xlsx';
 import './App.css';
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [devices, setDevices] = useState<Device[]>([]);
   const [stats, setStats] = useState<InventoryStatsType>({ totalDevices: 0, withNotes: 0, locations: 0 });
@@ -115,7 +114,12 @@ function App() {
     );
   }
 
-  if (!user) return <Login onLoginSuccess={() => { }} />;
+  if (!user) {
+    return <Login onLoginSuccess={() => {
+      const u = localStorage.getItem('it_stock_user');
+      if (u) setUser(JSON.parse(u));
+    }} />;
+  }
 
   return (
     <>
@@ -126,7 +130,7 @@ function App() {
           <span>IT Stock</span>
         </div>
         <div className="topnav-actions">
-          <span className="badge-email" title={user.email || ''}>{user.email?.split('@')[0]}</span>
+          <span className="badge-email" title={user.username}>{user.fullname}</span>
           <button
             className="btn btn-ghost"
             onClick={() => {
@@ -155,7 +159,7 @@ function App() {
             onSubmit={selected ? handleUpdate : handleAdd}
             onCancel={() => { setSelected(null); setShowForm(false); }}
             isLoading={isSaving}
-            currentUserEmail={user.email || ''}
+            currentUsername={user.username}
           />
         ) : showDetailedStats ? (
           <DetailedStats

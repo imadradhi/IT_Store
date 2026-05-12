@@ -6,19 +6,19 @@ interface DeviceFormProps {
   onSubmit: (device: Omit<Device, 'id'>) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
-  currentUserEmail: string;
+  currentUsername: string;
 }
 
-const empty = (email: string): Omit<Device, 'id'> => ({
+const empty = (username: string): Omit<Device, 'id'> => ({
   Code: '', Id: '', Name: '', Model: '', Location: '',
   MaintenanceDate: '', RequiredMaintenanceDate: '',
-  Note: '', ReceiptForm: 'None', UpdatedBy: email,
+  Note: '', ReceiptForm: 'None', UpdatedBy: username,
 });
 
 export const DeviceForm: React.FC<DeviceFormProps> = ({
-  device, onSubmit, onCancel, isLoading, currentUserEmail,
+  device, onSubmit, onCancel, isLoading, currentUsername,
 }) => {
-  const [f, setF] = useState<Omit<Device, 'id'>>(empty(currentUserEmail));
+  const [f, setF] = useState<Omit<Device, 'id'>>(empty(currentUsername));
 
   useEffect(() => {
     if (device) {
@@ -33,12 +33,12 @@ export const DeviceForm: React.FC<DeviceFormProps> = ({
           ? device.RequiredMaintenanceDate.split('T')[0] : '',
         Note: device.Note || '',
         ReceiptForm: device.ReceiptForm || 'None',
-        UpdatedBy: currentUserEmail,
+        UpdatedBy: currentUsername,
       });
     } else {
-      setF(empty(currentUserEmail));
+      setF(empty(currentUsername));
     }
-  }, [device, currentUserEmail]);
+  }, [device, currentUsername]);
 
   const change = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -50,7 +50,7 @@ export const DeviceForm: React.FC<DeviceFormProps> = ({
     const data = {
       ...f,
       Id: f.Code,
-      UpdatedBy: currentUserEmail,
+      UpdatedBy: currentUsername,
       MaintenanceDate: f.MaintenanceDate ? new Date(f.MaintenanceDate).toISOString() : '',
       RequiredMaintenanceDate: f.RequiredMaintenanceDate
         ? new Date(f.RequiredMaintenanceDate).toISOString() : '',
