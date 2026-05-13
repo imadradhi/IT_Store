@@ -35,6 +35,17 @@ function App() {
     return () => unsub();
   }, []);
 
+  // ── منع زر الرجوع في المتصفح ──
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href);
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   useEffect(() => {
     if (!user) { setDevices([]); return; }
     const unsub = subscribeToDevices(
@@ -159,7 +170,7 @@ function App() {
             onSubmit={selected ? handleUpdate : handleAdd}
             onCancel={() => { setSelected(null); setShowForm(false); }}
             isLoading={isSaving}
-            currentUsername={user.username}
+            currentUserFullname={user.fullname}
           />
         ) : showDetailedStats ? (
           <DetailedStats

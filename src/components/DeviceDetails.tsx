@@ -14,9 +14,9 @@ const fmt = (d: string) => {
   catch { return d; }
 };
 
-const formatName = (email: string) => {
-  if (!email) return '—';
-  return email.split('@')[0];
+const formatName = (name: string) => {
+  if (!name) return '—';
+  return name.includes('@') ? name.split('@')[0] : name;
 };
 
 export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, onDelete, onBack }) => {

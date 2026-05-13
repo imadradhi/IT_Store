@@ -12,9 +12,11 @@ const fmt = (d: string) => {
   catch { return d; }
 };
 
-const formatName = (email: string) => {
-  if (!email) return '';
-  return email.split('@')[0];
+const formatName = (name: string) => {
+  if (!name) return '';
+  // If it's an email/username (contains @), we might still want to trim it for old records
+  // but if it's a full name (no @), we return it as is.
+  return name.includes('@') ? name.split('@')[0] : name;
 };
 
 export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
