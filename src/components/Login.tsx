@@ -56,7 +56,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       <div className="login-card">
         <div className="login-logo">
           <div className="logo-icon">🖥️</div>
-          <h1>IT Stock </h1>
+          <h1>V 0.0.1 - IT Stock</h1>
           <p>{isRegister ? 'Create a new account' : 'Sign in to continue'}</p>
         </div>
 
@@ -113,8 +113,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <div className="login-footer">
             <p>
               {isRegister ? 'Already have an account?' : "Don't have an account?"}
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="login-link-btn"
                 onClick={() => {
                   setIsRegister(!isRegister);

@@ -138,7 +138,7 @@ function App() {
       <nav className="topnav">
         <div className="topnav-brand">
           <span>🖥️</span>
-          <span>IT Stock</span>
+          <span>V 0.0.1 - IT Stock</span>
         </div>
         <div className="topnav-actions">
           <span className="badge-email" title={user.username}>{user.fullname}</span>
