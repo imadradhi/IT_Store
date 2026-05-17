@@ -6,6 +6,8 @@ interface DeviceDetailsProps {
   onEdit: () => void;
   onDelete: () => void;
   onBack: () => void;
+  onMarkInventoried?: () => void;
+  isUpdating?: boolean;
 }
 
 const fmt = (d: string) => {
@@ -19,7 +21,9 @@ const formatName = (name: string) => {
   return name.includes('@') ? name.split('@')[0] : name;
 };
 
-export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, onDelete, onBack }) => {
+export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, onDelete, onBack, onMarkInventoried, isUpdating }) => {
+  const isWithin24Hours = device.MaintenanceDate && (new Date().getTime() - new Date(device.MaintenanceDate).getTime() < 24 * 60 * 60 * 1000);
+
   return (
     <div className="panel" style={{ animation: 'fadeIn 0.4s ease-out' }}>
       <div className="panel-header" style={{ 
@@ -61,6 +65,21 @@ export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, on
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {onMarkInventoried && (
+            <button 
+              className="btn btn-primary" 
+              onClick={onMarkInventoried} 
+              disabled={isWithin24Hours || isUpdating}
+              style={{ 
+                padding: '0.6rem 1.25rem', 
+                background: isWithin24Hours ? '#94a3b8' : '#16a34a',
+                cursor: isWithin24Hours ? 'not-allowed' : 'pointer',
+                opacity: isUpdating ? 0.7 : 1
+              }}
+            >
+              {isUpdating ? 'Saving...' : isWithin24Hours ? '✓ Recently Inventoried' : '✓ Mark Inventoried'}
+            </button>
+          )}
           <button className="btn btn-edit" onClick={onEdit} style={{ padding: '0.6rem 1.25rem' }}>
             ✏️ Edit
           </button>
@@ -98,10 +117,9 @@ export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, on
           </section>
 
           <section>
-            <h3 style={sectionHeaderStyle}>Maintenance Dates</h3>
+            <h3 style={sectionHeaderStyle}>Inventory Dates</h3>
             <div style={gridStyle}>
-              <DetailItem label="Last Maintenance" value={fmt(device.MaintenanceDate)} />
-              <DetailItem label="Next Required" value={fmt(device.RequiredMaintenanceDate)} />
+              <DetailItem label="Inventory Date" value={fmt(device.MaintenanceDate)} />
             </div>
           </section>
 

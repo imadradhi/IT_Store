@@ -13,6 +13,7 @@ import { DeviceList } from './components/DeviceList';
 import { DeviceForm } from './components/DeviceForm';
 import { DeviceDetails } from './components/DeviceDetails';
 import { DetailedStats } from './components/DetailedStats';
+import { InventorySession } from './components/InventorySession';
 import { Login } from './components/Login';
 import * as XLSX from 'xlsx';
 import './App.css';
@@ -29,6 +30,8 @@ function App() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'list' | 'inventory'>('list');
+  const [isUpdatingInventory, setIsUpdatingInventory] = useState<string | null>(null);
 
   useEffect(() => {
     const unsub = subscribeToAuthChanges((u) => { setUser(u); setAuthLoading(false); });
@@ -70,6 +73,23 @@ function App() {
     finally { setIsSaving(false); }
   };
 
+  const handleInventorySession = async (device: Device) => {
+    setIsUpdatingInventory(device.id);
+    try {
+      const updatedData = {
+        ...device,
+        MaintenanceDate: new Date().toISOString(),
+        UpdatedBy: user?.fullname || device.UpdatedBy
+      };
+      const { id, ...rest } = updatedData;
+      await updateDevice(id, rest);
+    } catch (err) {
+      setError('Failed to update inventory status.');
+    } finally {
+      setIsUpdatingInventory(null);
+    }
+  };
+
   const handleUpdate = async (data: Omit<Device, 'id'>) => {
     if (!selected) return;
     if (!window.confirm('هل أنت متأكد من حفظ التعديلات على هذه المادة؟')) return;
@@ -93,8 +113,8 @@ function App() {
         'Name': d.Name,
         'Model': d.Model,
         'Location': d.Location,
-        'Maintenance Date': d.MaintenanceDate ? new Date(d.MaintenanceDate).toLocaleDateString() : 'None',
-        'Required Maintenance': d.RequiredMaintenanceDate ? new Date(d.RequiredMaintenanceDate).toLocaleDateString() : 'None',
+        'Last Inventory Date': d.MaintenanceDate ? new Date(d.MaintenanceDate).toLocaleDateString() : 'None',
+        'Next Inventory Date': d.RequiredMaintenanceDate ? new Date(d.RequiredMaintenanceDate).toLocaleDateString() : 'None',
         'Note': d.Note || 'None',
         'Receipt Form': d.ReceiptForm || 'None',
         'Last Updated By': d.UpdatedBy || 'Unknown'
@@ -115,6 +135,8 @@ function App() {
     [d.Code, d.Name, d.Model, d.Location, d.Note, d.UpdatedBy]
       .some(v => (v || '').toLowerCase().includes(search.toLowerCase()))
   );
+
+  const currentSelectedDevice = selected ? (devices.find(d => d.id === selected.id) || selected) : null;
 
   if (authLoading) {
     return (
@@ -177,66 +199,120 @@ function App() {
             devices={devices}
             onClose={() => setShowDetailedStats(false)}
           />
-        ) : showDetails && selected ? (
+        ) : showDetails && currentSelectedDevice ? (
           <DeviceDetails
-            device={selected}
+            device={currentSelectedDevice}
             onEdit={() => { setShowDetails(false); setShowForm(true); }}
-            onDelete={() => handleDelete(selected.id)}
+            onDelete={() => handleDelete(currentSelectedDevice.id)}
             onBack={() => { setShowDetails(false); setSelected(null); }}
+            onMarkInventoried={() => handleInventorySession(currentSelectedDevice)}
+            isUpdating={isUpdatingInventory === currentSelectedDevice.id}
           />
         ) : (
           <>
-            {/* Stats */}
-            <InventoryStats stats={stats} />
-
-            {/* Toolbar */}
-            <div className="toolbar">
-              <button
-                className="btn btn-primary"
-                onClick={() => { setSelected(null); setShowForm(true); }}
+            {/* Tabs Container */}
+            <div className="tabs-container" style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              marginBottom: '1.5rem', 
+              borderBottom: '2px solid var(--border)',
+              padding: '0 0.5rem'
+            }}>
+              <button 
+                onClick={() => setActiveTab('list')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === 'list' ? '3px solid var(--primary)' : '3px solid transparent',
+                  color: activeTab === 'list' ? 'var(--primary)' : 'var(--text-muted)',
+                  fontWeight: activeTab === 'list' ? 700 : 500,
+                  cursor: 'pointer',
+                  fontSize: '1.05rem',
+                  transform: 'translateY(2px)'
+                }}
               >
-                ➕ Add Asset
+                Assets & Equipment List
               </button>
-              <button
-                className="btn btn-ghost"
-                style={{ background: '#e2e8f0', color: '#334155', border: 'none' }}
-                onClick={() => setShowDetailedStats(true)}
+              <button 
+                onClick={() => setActiveTab('inventory')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: activeTab === 'inventory' ? '3px solid var(--primary)' : '3px solid transparent',
+                  color: activeTab === 'inventory' ? 'var(--primary)' : 'var(--text-muted)',
+                  fontWeight: activeTab === 'inventory' ? 700 : 500,
+                  cursor: 'pointer',
+                  fontSize: '1.05rem',
+                  transform: 'translateY(2px)'
+                }}
               >
-                📊 Statistics
+                Inventory Session
               </button>
-              <button
-                className="btn btn-ghost"
-                style={{ background: '#dcfce7', color: '#166534', border: 'none' }}
-                onClick={handleExport}
-              >
-                📥 Export Excel
-              </button>
-
-              <div className="search-box">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search by code, name, location, updated by..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-
-              <span className="count-badge">{filtered.length} assets</span>
             </div>
 
-            {/* Table / Cards */}
-            <div className="panel">
-              <div className="panel-header">
-                <span className="panel-title">Assets & Equipment List</span>
-              </div>
-              <div className="panel-body">
-                <DeviceList
-                  devices={filtered}
-                  onView={(d) => { setSelected(d); setShowDetails(true); }}
-                />
-              </div>
-            </div>
+            {activeTab === 'list' ? (
+              <>
+                {/* Stats */}
+                <InventoryStats stats={stats} />
+
+                {/* Toolbar */}
+                <div className="toolbar">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => { setSelected(null); setShowForm(true); }}
+                  >
+                    ➕ Add Asset
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ background: '#e2e8f0', color: '#334155', border: 'none' }}
+                    onClick={() => setShowDetailedStats(true)}
+                  >
+                    📊 Statistics
+                  </button>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ background: '#dcfce7', color: '#166534', border: 'none' }}
+                    onClick={handleExport}
+                  >
+                    📥 Export Excel
+                  </button>
+
+                  <div className="search-box">
+                    <span className="search-icon">🔍</span>
+                    <input
+                      type="text"
+                      placeholder="Search by code, name, location, updated by..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <span className="count-badge">{filtered.length} assets</span>
+                </div>
+
+                {/* Table / Cards */}
+                <div className="panel">
+                  <div className="panel-header">
+                    <span className="panel-title">Assets & Equipment List</span>
+                  </div>
+                  <div className="panel-body">
+                    <DeviceList
+                      devices={filtered}
+                      onView={(d) => { setSelected(d); setShowDetails(true); }}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <InventorySession 
+                devices={devices} 
+                onInventory={handleInventorySession} 
+                isUpdating={isUpdatingInventory} 
+              />
+            )}
           </>
         )}
 

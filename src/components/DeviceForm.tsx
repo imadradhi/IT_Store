@@ -97,7 +97,7 @@ export const DeviceForm: React.FC<DeviceFormProps> = ({
               <input name="ReceiptForm" value={f.ReceiptForm} onChange={change} className="form-input" placeholder="None" />
             </div>
             <div className="form-group">
-              <label className="form-label">Maintenance Date</label>
+              <label className="form-label">Inventory Date</label>
               <input type="date" name="MaintenanceDate" value={f.MaintenanceDate} onChange={change} className="form-input" />
             </div>
             <div className="form-group col-2">

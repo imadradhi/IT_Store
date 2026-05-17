@@ -40,7 +40,7 @@ export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
               <th>Name</th>
               <th>Model</th>
               <th>Location</th>
-              <th>Maintenance Date</th>
+              <th>Inventory Date</th>
               <th>Note</th>
               <th>Receipt</th>
               <th>Last Updated By</th>
@@ -102,7 +102,7 @@ export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
                 <span className="meta-value">{d.Location || '—'}</span>
               </div>
               <div className="asset-card-meta-item">
-                <span className="meta-label">Maintenance Date</span>
+                <span className="meta-label">Inventory Date</span>
                 <span className="meta-value">{fmt(d.MaintenanceDate) ?? '—'}</span>
               </div>
               {d.Note && d.Note !== 'None' && (

@@ -68,7 +68,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 id="fullname"
                 type="text"
                 className="login-input"
-                placeholder="Ex: Imad Radhi"
+                placeholder="Your name and surname"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
                 required
