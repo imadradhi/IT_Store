@@ -15,17 +15,17 @@ export const InventoryStats: React.FC<StatsProps> = ({ stats }) => (
       </div>
     </div>
     <div className="stat-card">
-      <div className="stat-icon amber">📝</div>
+      <div className="stat-icon amber">✅</div>
       <div>
-        <div className="stat-val">{stats.withNotes}</div>
-        <div className="stat-label">With Notes</div>
+        <div className="stat-val">{stats.inventoriedLastMonth}</div>
+        <div className="stat-label">Inventoried Last Month</div>
       </div>
     </div>
     <div className="stat-card">
-      <div className="stat-icon green">📍</div>
+      <div className="stat-icon red" style={{ background: 'linear-gradient(135deg, #fee2e2, #fecaca)', color: '#b91c1c' }}>⏳</div>
       <div>
-        <div className="stat-val">{stats.locations}</div>
-        <div className="stat-label">Locations</div>
+        <div className="stat-val" style={{ color: '#b91c1c' }}>{stats.needsInventory}</div>
+        <div className="stat-label">Needs Inventory</div>
       </div>
     </div>
   </div>

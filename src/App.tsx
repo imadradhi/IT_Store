@@ -22,7 +22,7 @@ function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [devices, setDevices] = useState<Device[]>([]);
-  const [stats, setStats] = useState<InventoryStatsType>({ totalDevices: 0, withNotes: 0, locations: 0 });
+  const [stats, setStats] = useState<InventoryStatsType>({ totalDevices: 0, inventoriedLastMonth: 0, needsInventory: 0 });
   const [selected, setSelected] = useState<Device | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -160,7 +160,7 @@ function App() {
       <nav className="topnav">
         <div className="topnav-brand">
           <span>🖥️</span>
-          <span>V 0.0.1 - IT Stock</span>
+          <span>IT Stock 0.0.1</span>
         </div>
         <div className="topnav-actions">
           <span className="badge-email" title={user.username}>{user.fullname}</span>
@@ -211,14 +211,14 @@ function App() {
         ) : (
           <>
             {/* Tabs Container */}
-            <div className="tabs-container" style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              marginBottom: '1.5rem', 
+            <div className="tabs-container" style={{
+              display: 'flex',
+              gap: '1rem',
+              marginBottom: '1.5rem',
               borderBottom: '2px solid var(--border)',
               padding: '0 0.5rem'
             }}>
-              <button 
+              <button
                 onClick={() => setActiveTab('list')}
                 style={{
                   padding: '0.75rem 1.5rem',
@@ -234,7 +234,7 @@ function App() {
               >
                 Assets & Equipment List
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('inventory')}
                 style={{
                   padding: '0.75rem 1.5rem',
@@ -307,10 +307,10 @@ function App() {
                 </div>
               </>
             ) : (
-              <InventorySession 
-                devices={devices} 
-                onInventory={handleInventorySession} 
-                isUpdating={isUpdatingInventory} 
+              <InventorySession
+                devices={devices}
+                onInventory={handleInventorySession}
+                isUpdating={isUpdatingInventory}
               />
             )}
           </>

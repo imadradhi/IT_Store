@@ -22,9 +22,9 @@ export const InventorySession: React.FC<InventorySessionProps> = ({ devices, onI
           {devices.length} Total Assets
         </span>
       </div>
-      <div className="panel-body">
 
-        <div className="search-box" style={{ marginBottom: '1rem', maxWidth: '400px' }}>
+      <div style={{ padding: '1rem 2rem', borderBottom: '1px solid var(--border)', background: 'rgba(255, 255, 255, 0.5)', flexShrink: 0 }}>
+        <div className="search-box" style={{ maxWidth: '400px' }}>
           <span className="search-icon">🔍</span>
           <input
             type="text"
@@ -33,7 +33,9 @@ export const InventorySession: React.FC<InventorySessionProps> = ({ devices, onI
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+      </div>
 
+      <div className="panel-body">
         <div className="desktop-table">
           <table className="assets-table">
             <thead>

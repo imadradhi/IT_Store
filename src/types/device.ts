@@ -15,6 +15,6 @@ export interface Device {
 
 export interface InventoryStats {
   totalDevices: number;
-  withNotes: number;
-  locations: number;
+  inventoriedLastMonth: number;
+  needsInventory: number;
 }

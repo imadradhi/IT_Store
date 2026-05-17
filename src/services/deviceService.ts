@@ -87,10 +87,18 @@ export function subscribeToDevices(
 
 // Calculate inventory stats
 export function calculateStats(devices: Device[]): InventoryStats {
-  const uniqueLocations = new Set(devices.map(d => d.Location).filter(Boolean));
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const inventoriedLastMonth = devices.filter(d => 
+    d.MaintenanceDate && new Date(d.MaintenanceDate) >= thirtyDaysAgo
+  ).length;
+
+  const needsInventory = devices.length - inventoriedLastMonth;
+
   return {
     totalDevices: devices.length,
-    withNotes: devices.filter(d => d.Note && d.Note !== 'None' && d.Note.trim() !== '').length,
-    locations: uniqueLocations.size,
+    inventoriedLastMonth,
+    needsInventory,
   };
 }

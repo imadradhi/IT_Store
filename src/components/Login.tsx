@@ -56,7 +56,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       <div className="login-card">
         <div className="login-logo">
           <div className="logo-icon">🖥️</div>
-          <h1>V 0.0.1 - IT Stock</h1>
+          <h1>IT Stock 0.0.1</h1>
           <p>{isRegister ? 'Create a new account' : 'Sign in to continue'}</p>
         </div>
 
