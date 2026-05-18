@@ -20,6 +20,14 @@ const formatName = (name: string) => {
 };
 
 export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const isOverdue = (dateStr?: string) => {
+    if (!dateStr || dateStr === 'None') return true;
+    return new Date(dateStr) < thirtyDaysAgo;
+  };
+
   if (devices.length === 0) {
     return (
       <div className="empty-state">
@@ -54,7 +62,14 @@ export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
                 <td style={{ fontWeight: 600 }}>{d.Name}</td>
                 <td>{d.Model}</td>
                 <td>{d.Location}</td>
-                <td><span className="dash">{fmt(d.MaintenanceDate) ?? '—'}</span></td>
+                <td>
+                  <span style={{ 
+                    color: isOverdue(d.MaintenanceDate) ? 'var(--danger)' : 'inherit',
+                    fontWeight: isOverdue(d.MaintenanceDate) ? 700 : 'normal'
+                  }}>
+                    {fmt(d.MaintenanceDate) ?? '—'}
+                  </span>
+                </td>
                 <td>
                   {d.Note && d.Note !== 'None'
                     ? <span title={d.Note}>{d.Note}</span>
@@ -103,7 +118,11 @@ export const DeviceList: React.FC<DeviceListProps> = ({ devices, onView }) => {
               </div>
               <div className="asset-card-meta-item">
                 <span className="meta-label">Inventory Date</span>
-                <span className="meta-value">{fmt(d.MaintenanceDate) ?? '—'}</span>
+                <span className="meta-value" style={{ 
+                  color: isOverdue(d.MaintenanceDate) ? 'var(--danger)' : 'inherit' 
+                }}>
+                  {fmt(d.MaintenanceDate) ?? '—'}
+                </span>
               </div>
               {d.Note && d.Note !== 'None' && (
                 <div className="asset-card-meta-item" style={{ gridColumn: 'span 2' }}>

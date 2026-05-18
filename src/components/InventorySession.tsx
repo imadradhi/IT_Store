@@ -73,7 +73,7 @@ export const InventorySession: React.FC<InventorySessionProps> = ({ devices, onI
                         disabled={isWithin24Hours || isUpdating === d.id}
                         onClick={() => onInventory(d)}
                       >
-                        {isUpdating === d.id ? 'Saving...' : isWithin24Hours ? '✓ Inventoried' : '✓ Mark Inventoried'}
+                        {isUpdating === d.id ? 'Saving...' : isWithin24Hours ? '✓ Verified' : '✓ Verify'}
                       </button>
                     </td>
                   </tr>
@@ -88,6 +88,60 @@ export const InventorySession: React.FC<InventorySessionProps> = ({ devices, onI
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* ── Mobile Cards ── */}
+        <div className="mobile-cards" style={{ padding: '1rem' }}>
+          {filtered.map(d => {
+            const lastInvDate = d.MaintenanceDate ? new Date(d.MaintenanceDate).toLocaleDateString('en-GB') : '—';
+            const isWithin24Hours = d.MaintenanceDate && (new Date().getTime() - new Date(d.MaintenanceDate).getTime() < 24 * 60 * 60 * 1000);
+
+            return (
+              <div className="asset-card" key={d.id} style={{ background: isWithin24Hours ? '#f0fdf4' : 'var(--surface)' }}>
+                <div className="asset-card-header">
+                  <div>
+                    <span style={{ fontWeight: 600 }}>{d.Code}</span>&nbsp;
+                    <span className="asset-card-title">{d.Name}</span>
+                  </div>
+                </div>
+
+                <div className="asset-card-meta">
+                  <div className="asset-card-meta-item">
+                    <span className="meta-label">Location</span>
+                    <span className="meta-value">{d.Location || '—'}</span>
+                  </div>
+                  <div className="asset-card-meta-item">
+                    <span className="meta-label">Last Inventory</span>
+                    <span className="meta-value" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span className="dash">{lastInvDate}</span>
+                      {isWithin24Hours && <span style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 'bold' }}>(Recently)</span>}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="asset-card-actions">
+                  <button 
+                    className="btn btn-primary"
+                    style={{ 
+                      width: '100%',
+                      background: isWithin24Hours ? '#94a3b8' : '#16a34a',
+                      cursor: isWithin24Hours ? 'not-allowed' : 'pointer',
+                      opacity: isUpdating === d.id ? 0.7 : 1
+                    }}
+                    disabled={isWithin24Hours || isUpdating === d.id}
+                    onClick={() => onInventory(d)}
+                  >
+                    {isUpdating === d.id ? 'Saving...' : isWithin24Hours ? '✓ Verified' : '✓ Verify'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="empty-state" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+              No assets found.
+            </div>
+          )}
         </div>
       </div>
     </div>

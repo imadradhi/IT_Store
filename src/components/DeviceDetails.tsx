@@ -77,7 +77,7 @@ export const DeviceDetails: React.FC<DeviceDetailsProps> = ({ device, onEdit, on
                 opacity: isUpdating ? 0.7 : 1
               }}
             >
-              {isUpdating ? 'Saving...' : isWithin24Hours ? '✓ Recently Inventoried' : '✓ Mark Inventoried'}
+              {isUpdating ? 'Saving...' : isWithin24Hours ? '✓ Verified' : '✓ Verify'}
             </button>
           )}
           <button className="btn btn-edit" onClick={onEdit} style={{ padding: '0.6rem 1.25rem' }}>
